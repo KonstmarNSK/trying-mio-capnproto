@@ -1,4 +1,3 @@
-use capnp::io::Write;
 use capnp::serialize_packed;
 use std::error::Error;
 use mio::net::{TcpListener, TcpStream};
@@ -15,9 +14,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut point = message.init_root::<point_capnp::point::Builder>();
     point.set_x(10.0f32);
     point.set_y(12.4f32);
-
-    serialize_packed::write_message(&mut ::std::io::stdout(), &message)?;
-
 
     let mut poll = Poll::new()?;
     let mut events = Events::with_capacity(128);
@@ -40,7 +36,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 CLIENT => {
                     if event.is_writable() {
                         // We can (likely) write to the socket without blocking.
-                        client.write_all(b"Some string");
+                        serialize_packed::write_message(&mut client, &message)?;
                         println!("Client wrote!");
                     }
 

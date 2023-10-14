@@ -1,3 +1,6 @@
+use std::io::{self, BufReader};
+use std::io::prelude::*;
+use capnp::serialize_packed;
 use std::error::Error;
 use mio::net::{TcpListener, TcpStream};
 use mio::{Events, Interest, Poll, Token};
@@ -38,9 +41,17 @@ pub fn main() -> Result<(), Box<dyn Error>> {
                     //
                     // Accept the connection and drop it immediately. This will
                     // close the socket and notify the client of the EOF.
-                    let connection = server.accept();
+                    let (mut connection, _) = server.accept().unwrap();
                     println!("Server accepted!");
-                    drop(connection);
+
+                    let mut reader = BufReader::new(connection);
+                    let msg_reader = serialize_packed::read_message(&mut reader, ::capnp::message::ReaderOptions::new(),)?;
+
+                    let msg = msg_reader.get_root::<point_capnp::point::Reader>()?;
+
+                    println!("Got from client: ({}, {})", msg.get_x(), msg.get_y());
+                    
+                    drop(reader);
                 }
                 // We don't expect any events with tokens other than those we provided.
                 _ => unreachable!(),
