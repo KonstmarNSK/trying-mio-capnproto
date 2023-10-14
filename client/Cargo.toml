@@ -6,6 +6,8 @@ edition = "2021"
 
 [dependencies]
 capnp = "0.18.1"
+mio = {version= "0.8", features = ["os-poll", "net"]}
 
 [build-dependencies]
 capnpc = "0.18.0"
+
