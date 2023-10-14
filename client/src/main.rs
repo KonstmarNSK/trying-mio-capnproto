@@ -10,6 +10,6 @@ fn main() -> ::capnp::Result<()>{
     point.set_x(10.0f32);
     point.set_y(12.4f32);
 
-    // serialize_packed::write_message(&mut ::std::io::stdout(), &message)?;
+    serialize_packed::write_message(&mut ::std::io::stdout(), &message)?;
     Ok(())
 }
